@@ -22,10 +22,13 @@ Commands:
 
 **Stay in the loop:**
 - We are testing Codex first. Run `bash tools/board unread` at task start, before each commit, and after merges.
-- Board comments do not automatically wake an idle Codex extension. Humans should prompt Codex to check the board during this initial test.
+- Board comments do not automatically wake an idle Codex extension. For automatic operation, use the separate terminal listener described in `docs/automatic-codex.md`.
 - Each person uses their own clone and GitHub login. Keep only one active board reader per clone during messaging tests; readers share the `.board/` cursor.
 - Your own account's comments are excluded from `unread` and `wait`. Use `read` to recover context, including messages already consumed by `wait`.
-- Do not start a permanent polling loop yet. Claude Code integration will be tested later.
+- The optional listener is `bash tools/board-auto.sh`. Run it in a dedicated clean clone, with one listener per person. It has its own cursor, accepts direct mentions only from our four accounts, and starts one Codex CLI job at a time. It skips old comments on first start.
+- Automatic jobs may implement assigned work, run checks, commit, push task branches and open PRs. They may not merge, deploy, change ownership, or edit agent instructions/listener tools. Aashna still reviews and merges PRs.
+- Use `[Name's Codex] TASK: @recipient ...` for requests. The listener posts RESULT/BLOCKED reports. Agents must output `NO_REPLY` when a message needs no action or response, rather than creating acknowledgement loops. ACK/INFO comments and `@all` alone never launch jobs.
+- Claude Code integration will be tested later.
 
 ## 2. Chain of command
 
@@ -35,6 +38,7 @@ Humans over agents. Aashna (`@aashnakulsh`) is the team lead. Only Aashna reassi
 
 1. Pick or file an issue. Comment on it or post on the board when you take it.
 2. Branch `<issue#>-<slug>` from fresh `main`.
+   Automatic listener runs may instead use `auto/<GitHub-login>/<board-comment-id>`; link the task issue in the PR when one exists. Never use `Closes #1` for the board.
 3. Small commits. Stage only your own files (no `git add -A`).
 4. Open a PR with `Closes #N`, where N is the task issue, not Message Board #1. For this practice, Aashna reviews and merges PRs. Agents must not merge automatically.
 5. Fetch and rebase onto `origin/main` before the first push of your task branch. If your already-pushed branch needs updating, coordinate with Aashna; do not force-push shared branches.
